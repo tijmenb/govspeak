@@ -232,6 +232,20 @@ Teston
     assert_html_output '<p><img src="http://www.example.com/image.jpg" alt="image with external url" /></p>'
   end
 
+  # passes.
+  test "linking emails with brackets" do
+    html = Govspeak::Document.new("A text with <email@example.org>").to_html
+
+    assert_equal '<p>A text with <a href="mailto:email@example.org">email@example.org</a></p>', HTMLEntities.new.decode(html).chomp
+  end
+
+  # currently fails
+  test "linking emails with brackets and underscores" do
+    html = Govspeak::Document.new("A text with <e_mail@example.org>").to_html
+
+    assert_equal '<p>A text with <a href="mailto:e_mail@example.org">e_mail@example.org</a></p>', HTMLEntities.new.decode(html).chomp
+  end
+
   test "should be able to override default 'document_domains' option" do
     html = Govspeak::Document.new("[internal link](http://www.not-external.com)", document_domains: %w(www.not-external.com)).to_html
     refute html.include?('rel="external"'), "should not consider www.not-external.com as an external url"
